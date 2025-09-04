@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 export function Navigation() {
+  const pathname = usePathname()
   const scrollToTravelMap = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     const element = document.getElementById('travel-map')
@@ -65,14 +67,26 @@ export function Navigation() {
       >
         <ul className="menu md:menu-horizontal gap-2 p-0 text-base max-md:mt-2">
           <li>
-            <a href="#trip-listing" onClick={scrollToTripListing}>
-              All Trips
-            </a>
+            {pathname === '/' ? (
+              <a href="#trip-listing" onClick={scrollToTripListing}>
+                All Trips
+              </a>
+            ) : (
+              <Link href="/">
+                All Trips
+              </Link>
+            )}
           </li>
           <li>
-            <a href="#travel-map" onClick={scrollToTravelMap}>
-              Travel Map
-            </a>
+            {pathname === '/' ? (
+              <a href="#travel-map" onClick={scrollToTravelMap}>
+                Travel Map
+              </a>
+            ) : (
+              <Link href="/#travel-map">
+                Travel Map
+              </Link>
+            )}
           </li>
         </ul>
       </div>
