@@ -401,9 +401,9 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
       <div className="card-body">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h2 className="card-title text-2xl mb-2">🗾 Asia Travel Map</h2>
+            <h2 className="card-title text-2xl mb-2">🗾 World Travel Map</h2>
             <p className="text-base-content/70">
-              Explore the Asian countries I've visited and discover my travel journey across Asia
+              Explore the World countries I've visited and discover my travel journey across the world
             </p>
           </div>
           <div className="stats bg-base-200 shadow-sm mt-4 md:mt-0">
@@ -444,7 +444,7 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
             <div className="flex items-center justify-center h-64 bg-base-200 rounded-lg">
               <div className="text-center">
                 <span className="loading loading-spinner loading-lg text-primary"></span>
-                <p className="mt-2 text-base-content/70">Loading Asia map...</p>
+                <p className="mt-2 text-base-content/70">Loading World map...</p>
               </div>
             </div>
           ) : (
@@ -459,7 +459,7 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
         {totalCountries > 0 && (
           <div className="mt-6 text-center">
             <p className="text-base-content/70">
-              🎯 Hover over highlighted Asian countries to see trip details
+              🎯 Hover over highlighted World countries to see trip details
             </p>
           </div>
         )}

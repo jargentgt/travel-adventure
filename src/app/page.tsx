@@ -221,7 +221,7 @@ export default function HomePage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-base-200 rounded-2xl p-6 mb-8">
+        <div id="trip-listing" className="bg-base-200 rounded-2xl p-6 mb-8">
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="flex flex-wrap gap-4 items-center">
               {/* Year Filter */}

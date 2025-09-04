@@ -12,6 +12,14 @@ export function Navigation() {
     }
   }
 
+  const scrollToTripListing = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const element = document.getElementById('trip-listing')
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   // Fallback toggle functionality in case FlyonUI script doesn't load
   useEffect(() => {
     const toggleButton = document.querySelector('[data-collapse="#navbar-collapse"]')
@@ -56,7 +64,11 @@ export function Navigation() {
         className="md:navbar-end collapse hidden grow basis-full overflow-hidden transition-[height] duration-300 max-md:w-full"
       >
         <ul className="menu md:menu-horizontal gap-2 p-0 text-base max-md:mt-2">
-          <li><Link href="/">All Trips</Link></li>
+          <li>
+            <a href="#trip-listing" onClick={scrollToTripListing}>
+              All Trips
+            </a>
+          </li>
           <li>
             <a href="#travel-map" onClick={scrollToTravelMap}>
               Travel Map
