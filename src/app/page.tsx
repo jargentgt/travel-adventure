@@ -5,13 +5,14 @@ import Link from 'next/link'
 import { FilterOptions } from '@/types/trip'
 import { LoadingScreen, LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { WorldTravelMap } from '@/components/WorldTravelMap'
-import { useTrips, useTripsLoading, useTripsError, useFetchTrips } from '@/stores/tripsStore'
+import { useTrips, useTripsLoading, useTripsError, useFetchTrips, useTripsPagination } from '@/stores/tripsStore'
 import { formatDateRange, formatShortDate } from '@/utils/dateFormatter'
 
 
 export default function HomePage() {
   // Use individual Zustand selectors to prevent re-renders
   const trips = useTrips()
+  const pagination = useTripsPagination()
   const isLoading = useTripsLoading()
   const error = useTripsError()
   const fetchTrips = useFetchTrips()
@@ -19,6 +20,7 @@ export default function HomePage() {
   // Local state for UI
   const [filteredTrips, setFilteredTrips] = useState(trips)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterOptions>({
     year: '',
     country: ''
@@ -26,8 +28,8 @@ export default function HomePage() {
 
   // Load trips on component mount
   useEffect(() => {
-    fetchTrips()
-  }, []) // Remove fetchTrips from dependencies to prevent infinite loop
+    fetchTrips(currentPage)
+  }, [currentPage]) // Fetch when page changes
 
   // Combined effect: sync and filter trips when data or filters change
   useEffect(() => {
@@ -100,7 +102,7 @@ export default function HomePage() {
           <h1 className="text-2xl font-bold mb-2">Failed to Load Trips</h1>
           <p className="text-base-content/70 mb-6">{error}</p>
           <button 
-            onClick={fetchTrips}
+            onClick={() => fetchTrips(currentPage)}
             className="btn btn-primary"
           >
             Try Again
@@ -392,6 +394,31 @@ export default function HomePage() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Simple Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="text-center mt-8 mb-8">
+            <div className="join">
+              <button
+                className={`join-item btn ${!pagination.hasPrevPage ? 'btn-disabled' : ''}`}
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={!pagination.hasPrevPage}
+              >
+                ← Previous
+              </button>
+              <button className="join-item btn btn-active btn-primary">
+                Page {currentPage} of {pagination.totalPages}
+              </button>
+              <button
+                className={`join-item btn ${!pagination.hasNextPage ? 'btn-disabled' : ''}`}
+                onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
+                disabled={!pagination.hasNextPage}
+              >
+                Next →
+              </button>
+            </div>
           </div>
         )}
 

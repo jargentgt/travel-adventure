@@ -124,19 +124,20 @@ class OptimizedPayloadService {
   }
 
   /**
-   * Get trips using our custom API endpoint
+   * Get trips using our custom API endpoint with pagination support
    */
-  async getTrips(): Promise<TripListing[]> {
+  async getTrips(page: number = 1, limit: number = 12): Promise<{ trips: TripListing[], pagination: any }> {
     try {
-      const response = await fetch(
-        `${this.baseUrl}/api/frontend/trips`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      const url = new URL(`${this.baseUrl}/api/frontend/trips`)
+      url.searchParams.set('page', page.toString())
+      url.searchParams.set('limit', limit.toString())
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -151,7 +152,19 @@ class OptimizedPayloadService {
       }
 
       // Transform each trip using our mapping function
-      return result.data.trips.map((trip: any) => this.transformTripListing(trip))
+      const trips = result.data.trips.map((trip: any) => this.transformTripListing(trip))
+      
+      return {
+        trips,
+        pagination: {
+          totalDocs: result.data.totalDocs,
+          totalPages: result.data.totalPages,
+          page: result.data.page,
+          limit: result.data.limit,
+          hasNextPage: result.data.hasNextPage,
+          hasPrevPage: result.data.hasPrevPage
+        }
+      }
     } catch (error) {
       console.error('Error fetching trips:', error)
       throw error
