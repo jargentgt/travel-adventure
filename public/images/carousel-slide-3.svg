@@ -1,0 +1,91 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sunset sky gradient -->
+  <defs>
+    <linearGradient id="thailand-sunsetSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB347;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#FF7F50;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#FF6347;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF4500;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="thailand-oceanSunset" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4682B4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E90FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#191970;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="thailand-sandGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F4A460;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="thailand-sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF4500;stop-opacity:0.5" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#thailand-sunsetSky)"/>
+  
+  <!-- Ocean -->
+  <rect x="0" y="250" width="1200" height="150" fill="url(#thailand-oceanSunset)"/>
+  
+  <!-- Beach/Sand -->
+  <ellipse cx="600" cy="380" rx="800" ry="50" fill="url(#thailand-sandGradient)"/>
+  
+  <!-- Sun -->
+  <circle cx="200" cy="120" r="50" fill="url(#thailand-sunGlow)"/>
+  <circle cx="200" cy="120" r="40" fill="#FFD700"/>
+  
+  <!-- Sun reflection on water -->
+  <ellipse cx="200" cy="280" rx="30" ry="80" fill="#FFD700" opacity="0.4"/>
+  <ellipse cx="200" cy="290" rx="25" ry="60" fill="#FF6347" opacity="0.3"/>
+  
+  <!-- Palm trees -->
+  <!-- Palm tree 1 -->
+  <rect x="98" y="300" width="4" height="60" fill="#8B4513"/>
+  <ellipse cx="100" cy="295" rx="15" ry="8" fill="#228B22"/>
+  <ellipse cx="85" cy="290" rx="18" ry="6" fill="#32CD32" transform="rotate(-20 85 290)"/>
+  <ellipse cx="115" cy="290" rx="18" ry="6" fill="#32CD32" transform="rotate(20 115 290)"/>
+  <ellipse cx="90" cy="285" rx="16" ry="5" fill="#228B22" transform="rotate(-40 90 285)"/>
+  <ellipse cx="110" cy="285" rx="16" ry="5" fill="#228B22" transform="rotate(40 110 285)"/>
+  
+  <!-- Palm tree 2 -->
+  <rect x="948" y="280" width="4" height="80" fill="#8B4513"/>
+  <ellipse cx="950" cy="275" rx="15" ry="8" fill="#228B22"/>
+  <ellipse cx="935" cy="270" rx="18" ry="6" fill="#32CD32" transform="rotate(-20 935 270)"/>
+  <ellipse cx="965" cy="270" rx="18" ry="6" fill="#32CD32" transform="rotate(20 965 270)"/>
+  <ellipse cx="940" cy="265" rx="16" ry="5" fill="#228B22" transform="rotate(-40 940 265)"/>
+  <ellipse cx="960" cy="265" rx="16" ry="5" fill="#228B22" transform="rotate(40 960 265)"/>
+  
+  <!-- Palm tree 3 (smaller, in background) -->
+  <rect x="798" y="320" width="3" height="50" fill="#8B4513"/>
+  <ellipse cx="800" cy="315" rx="12" ry="6" fill="#228B22"/>
+  <ellipse cx="788" cy="312" rx="14" ry="5" fill="#32CD32" transform="rotate(-25 788 312)"/>
+  <ellipse cx="812" cy="312" rx="14" ry="5" fill="#32CD32" transform="rotate(25 812 312)"/>
+  
+  <!-- Clouds -->
+  <ellipse cx="400" cy="80" rx="30" ry="15" fill="white" opacity="0.7"/>
+  <ellipse cx="420" cy="75" rx="25" ry="12" fill="white" opacity="0.7"/>
+  <ellipse cx="440" cy="85" rx="20" ry="10" fill="white" opacity="0.7"/>
+  
+  <ellipse cx="800" cy="100" rx="35" ry="18" fill="white" opacity="0.6"/>
+  <ellipse cx="820" cy="95" rx="30" ry="15" fill="white" opacity="0.6"/>
+  <ellipse cx="840" cy="105" rx="25" ry="12" fill="white" opacity="0.6"/>
+  
+  <!-- Seagulls -->
+  <path d="M 500 150 Q 505 145 510 150 Q 515 145 520 150" stroke="white" stroke-width="2" fill="none"/>
+  <path d="M 600 120 Q 605 115 610 120 Q 615 115 620 120" stroke="white" stroke-width="2" fill="none"/>
+  <path d="M 700 140 Q 705 135 710 140 Q 715 135 720 140" stroke="white" stroke-width="2" fill="none"/>
+  
+  <!-- Boat silhouette -->
+  <ellipse cx="1000" cy="280" rx="40" ry="8" fill="#4B4B4B"/>
+  <rect x="1020" y="270" width="2" height="20" fill="#4B4B4B"/>
+  <polygon points="1018,270 1025,270 1021,265" fill="#4B4B4B"/>
+  
+  <!-- Title overlay -->
+  <rect x="0" y="0" width="1200" height="400" fill="black" opacity="0.3"/>
+  <text x="600" y="180" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="white">Thailand</text>
+  <text x="600" y="220" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="white" opacity="0.9">Tropical Paradise & Golden Beaches</text>
+</svg> 

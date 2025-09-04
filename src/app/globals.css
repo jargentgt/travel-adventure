@@ -1,0 +1,643 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* FlyonUI CSS Variables */
+:root {
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  
+  /* Theme color overrides */
+  --s: 230 80% 55%;
+  --sc: 230 95% 95%;
+  
+  /* Additional theme variables */
+  --rounded-btn: 0.5rem;
+  --rounded-badge: 1.9rem;
+  --rounded-box: 1rem;
+  --animation-btn: 0.25s;
+  --animation-input: 0.2s;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.5rem;
+}
+
+/* Ensure proper theme inheritance */
+[data-theme] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Fix badge styling issues */
+.badge-sm {
+  --size: calc(var(--text-xs, 0.75rem) * 1.5);
+  font-size: var(--text-xs, 0.75rem);
+  line-height: var(--text-xs--line-height, 1rem);
+  height: auto;
+  min-height: var(--size);
+  padding-inline: calc(var(--size) * 0.5);
+  padding-block: calc(var(--size) * 0.15);
+}
+
+.badge-outline {
+  border-width: var(--border-btn, 1px);
+  border-style: solid;
+  background-color: transparent;
+}
+
+/* Ensure proper theme colors */
+.badge-primary {
+  background-color: hsl(var(--p, 259 94% 51%));
+  color: hsl(var(--pc, 259 96% 91%));
+}
+
+.badge-secondary {
+  background-color: hsl(var(--s, 230 80% 55%));
+  color: hsl(var(--sc, 230 95% 95%));
+}
+
+.badge-accent {
+  background-color: hsl(var(--a, 174 60% 51%));
+  color: hsl(var(--ac, 174 60% 15%));
+}
+
+.badge-info {
+  background-color: hsl(var(--in, 198 93% 60%));
+  color: hsl(var(--inc, 198 100% 12%));
+}
+
+.badge-success {
+  background-color: hsl(var(--su, 158 64% 52%));
+  color: hsl(var(--suc, 158 100% 10%));
+}
+
+.badge-warning {
+  background-color: hsl(var(--wa, 43 96% 56%));
+  color: hsl(var(--wac, 43 100% 11%));
+}
+
+.badge-error {
+  background-color: hsl(var(--er, 0 91% 71%));
+  color: hsl(var(--erc, 0 100% 14%));
+}
+
+@layer base {
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Standardized Container Classes */
+@layer components {
+  /* Main content container with standard padding */
+  .content-container {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Section container with vertical padding */
+  .section-container {
+    @apply content-container py-6;
+  }
+  
+  /* Large section container with more vertical space */
+  .section-container-lg {
+    @apply content-container py-8 lg:py-12;
+  }
+  
+  /* Narrow content container for focused content like timelines */
+  .content-container-narrow {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Custom drag over state for file drop zone */
+#drop-zone.dragover {
+  border-color: hsl(var(--p)) !important;
+  background-color: hsl(var(--p) / 0.1) !important;
+}
+
+/* Hero gradient animations */
+.hero-gradient {
+  background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+}
+
+/* Timeline enhancements */
+.timeline-vertical .timeline-box::before {
+  transition: all 0.3s ease;
+}
+
+.timeline-vertical .timeline-box:hover::before {
+  border-color: hsl(var(--p));
+}
+
+/* Navigation scroll effect */
+.navbar-scroll {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .navbar-scroll {
+  background-color: rgba(31, 41, 55, 0.8);
+}
+
+/* Navbar dropdown positioning fixes */
+.navbar .dropdown {
+  position: relative;
+}
+
+.navbar .dropdown .dropdown-content {
+  position: absolute !important;
+  top: 100% !important;
+  z-index: 1000 !important;
+  transform: translateY(0) !important;
+}
+
+.navbar .dropdown.dropdown-end .dropdown-content {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Ensure dropdowns don't affect navbar height */
+.dropdown-content.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.dropdown-content:not(.hidden) {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Timeline specific hidden elements */
+.timeline [id^="full-"].hidden {
+  display: none !important;
+}
+
+.timeline [id^="preview-"] {
+  display: inline !important;
+}
+
+.timeline [id^="full-"]:not(.hidden) {
+  display: inline !important;
+}
+
+/* Hero section perfect centering */
+.hero .hero-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+/* Input group flex layout */
+.input-group {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+/* Enhanced Timeline Styling */
+.timeline-snap-icon .timeline-middle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 1rem;
+}
+
+/* Timeline marker improvements */
+.timeline-snap-icon .timeline-middle span {
+  transition: all 0.3s ease;
+  border: 2px solid hsl(var(--p));
+}
+
+.timeline-snap-icon .timeline-middle span:hover {
+  transform: scale(1.05);
+}
+
+/* Time positioning near center */
+.timeline-time-left {
+  max-width: 100px;
+  margin-left: auto;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 48px; /* Match h-12 (3rem = 48px) */
+  text-align: right;
+}
+
+.timeline-time-right {
+  max-width: 100px;
+  margin-right: auto;
+  margin-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 48px; /* Match h-12 (3rem = 48px) */
+  text-align: left;
+}
+
+/* Card styling within timeline - Fix overflow issues */
+.timeline .card {
+  border: 1px solid hsl(var(--bc) / 0.1);
+  transition: all 0.3s ease;
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.timeline .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Timeline content width constraints */
+.timeline-start, 
+.timeline-end {
+  max-width: 80%;
+  width: 100%;
+  min-width: 300px;
+}
+
+.timeline-start .card,
+.timeline-end .card {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Card body text wrapping */
+.timeline .card-body {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+.timeline .card-body p,
+.timeline .card-body span,
+.timeline .card-body div {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Ensure long URLs and text break properly */
+.timeline .card-body a {
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  display: inline-block;
+}
+
+/* Special handling for activity descriptions */
+.timeline .card-body [id^="preview-"],
+.timeline .card-body [id^="full-"] {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+  display: inline;
+}
+
+/* Ensure truncated content shows by default */
+.timeline .card-body [id^="preview-"]:not(.hidden) {
+  display: inline !important;
+}
+
+/* Ensure full content is hidden by default */
+.timeline .card-body [id^="full-"].hidden {
+  display: none !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .timeline-snap-icon .timeline-middle {
+    padding-top: 0.5rem;
+  }
+  
+  .timeline .card {
+    margin: 0.5rem 0;
+    max-width: 100%;
+  }
+  
+  .timeline-start, 
+  .timeline-end {
+    max-width: 100%;
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* Force consistent time positioning for mobile - all times on the left */
+  .timeline-time-left,
+  .timeline-time-right {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    max-width: 80px;
+    height: 48px;
+    font-size: 0.75rem;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+  
+  .timeline-time-left div,
+  .timeline-time-right div {
+    font-size: 0.75rem;
+  }
+
+  /* Force all content consistently positioned on mobile */
+  .timeline .timeline-start,
+  .timeline .timeline-end {
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+
+  /* Fix navbar on mobile */
+  .navbar {
+    padding: 0.5rem 1rem;
+    min-height: 4rem;
+  }
+
+  .navbar-start .btn {
+    padding: 0.5rem;
+  }
+
+  .navbar-start .btn-ghost {
+    font-size: 1rem;
+  }
+
+  /* Search input on mobile */
+  .navbar-end .form-control {
+    margin-right: 0.5rem;
+  }
+
+  .navbar-end .input-sm {
+    width: 8rem;
+    font-size: 0.875rem;
+  }
+
+  /* Theme switcher on mobile */
+  .navbar-end .btn-circle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  /* Dropdown positioning fixes for mobile */
+  .dropdown-content {
+    min-width: 12rem;
+    max-width: 90vw;
+  }
+
+  /* Hero section mobile optimization */
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero-content {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem !important;
+    line-height: 1.2;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Input group mobile styling */
+  .input-group {
+    width: 100%;
+  }
+
+  .input-group .input {
+    font-size: 1rem;
+  }
+
+  /* Card spacing on mobile */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Timeline card improvements on mobile */
+  .timeline .card-body {
+    padding: 1rem;
+  }
+
+  .timeline .card-title {
+    font-size: 1.125rem;
+  }
+
+  /* Badge adjustments on mobile */
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Show/Hide button improved styling */
+.btn-primary.btn-xs {
+  font-weight: 500;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  text-transform: none;
+}
+
+.btn-primary.btn-xs:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Copy button styling */
+.btn-ghost.btn-xs {
+  padding: 0.125rem 0.25rem;
+  min-height: auto;
+  height: auto;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.btn-ghost.btn-xs:hover {
+  background-color: hsl(var(--p) / 0.1) !important;
+  transform: scale(1.1);
+}
+
+/* Enhanced dismissible badge styling */
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-badge, 1.9rem);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.badge.gap-2 {
+  gap: 0.5rem;
+}
+
+.badge.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.badge.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Close button styling for dismissible badges */
+.badge button[aria-label*="Remove"] {
+  position: relative;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  margin-left: 0.25rem;
+  margin-right: -0.25rem;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+
+.badge button[aria-label*="Remove"]:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.badge button[aria-label*="Remove"]:active {
+  transform: scale(0.95);
+}
+
+/* Badge color variations with better contrast */
+.badge-primary {
+  background-color: hsl(var(--p, 259 94% 51%));
+  color: hsl(var(--pc, 259 96% 91%));
+  border: 1px solid hsl(var(--p, 259 94% 51%) / 0.2);
+}
+
+.badge-secondary {
+  background-color: hsl(var(--s, 230 80% 55%));
+  color: hsl(var(--sc, 230 95% 95%));
+  border: 1px solid hsl(var(--s, 230 80% 55%) / 0.2);
+}
+
+.badge-accent {
+  background-color: hsl(var(--a, 174 60% 51%));
+  color: hsl(var(--ac, 174 60% 15%));
+  border: 1px solid hsl(var(--a, 174 60% 51%) / 0.2);
+}
+
+/* Rain plan activity styling */
+.rain-plan-card {
+  position: relative;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.rain-plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.1) 0%, rgba(219, 234, 254, 0.2) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Rain plan timeline marker (removed animation) */
+.rain-plan-marker {
+  /* Clean styling without animation */
+}
+
+/* Rain plan badge styling */
+.rain-plan-badge {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.8) 0%, rgba(147, 197, 253, 0.6) 100%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+/* Link styling in descriptions */
+.card-body a {
+  color: hsl(var(--p));
+  text-decoration: underline;
+  transition: color 0.2s ease;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+.card-body a:hover {
+  color: hsl(var(--pf));
+  text-decoration: none;
+} 
