@@ -10,6 +10,7 @@ assets/
 .next/
 .env*
 out/
+.firebase/*
 
 # Compiled Java class files
 *.class

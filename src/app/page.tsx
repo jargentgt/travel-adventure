@@ -115,27 +115,22 @@ export default function HomePage() {
       {/* Carousel Section */}
       {filteredTrips.length > 0 && (
         <div className="w-full relative overflow-hidden">
-          <div className="carousel w-full" style={{ display: 'flex', minHeight: '300px' }}>
+          <div className="carousel w-full aspect-[16/9] max-h-[600px]">
             {filteredTrips.slice(0, 10).map((trip, index) => {
               const hasImage = getImageUrl(trip.coverImage) && getImageUrl(trip.coverImage).trim() !== ''
               
               return (
-                <div key={trip.id} id={`slide${index + 1}`} className="carousel-item relative w-full flex-shrink-0">
+                <div key={trip.id} id={`slide${index + 1}`} className="carousel-item relative w-full h-full flex-shrink-0">
                   {hasImage ? (
-                    <div className="w-full flex justify-center">
+                    <div className="w-full h-full flex justify-center">
                       <img
                         src={getImageUrl(trip.coverImage)}
                         alt={trip.coverImage?.alt || trip.title}
-                        className="w-full object-cover"
-                        style={{ 
-                          maxHeight: '400px',
-                          minHeight: '300px',
-                          height: 'auto'
-                        }}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   ) : (
-                    <div className="w-full min-h-[300px] h-[400px] bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700"></div>
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700"></div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/60 flex items-center justify-center">
                     <div className="hero-content text-center text-white max-w-4xl px-6">
@@ -218,6 +213,11 @@ export default function HomePage() {
 
       <div className="section-container-lg">
 
+        {/* World Travel Map Section */}
+        <div id="travel-map" className="mb-16">
+          <WorldTravelMap trips={filteredTrips.length > 0 ? filteredTrips : trips} />
+        </div>
+
         {/* Filters */}
         <div className="bg-base-200 rounded-2xl p-6 mb-8">
           <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -297,7 +297,6 @@ export default function HomePage() {
         </div>
 
 
-
         {/* Trip Listing */}
         {filteredTrips.length === 0 && !isLoading ? (
           <div className="text-center py-16">
@@ -323,7 +322,7 @@ export default function HomePage() {
               <Link key={trip.id} href={`/trip/${trip.slug}`} className="group">
                 <div className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                   {/* Trip Image */}
-                  <figure className="h-48 overflow-hidden relative">
+                  <figure className="aspect-[16/9] overflow-hidden relative">
                     {getImageUrl(trip.coverImage) ? (
                       <img
                         src={getImageUrl(trip.coverImage)}
@@ -395,11 +394,6 @@ export default function HomePage() {
             ))}
           </div>
         )}
-
-        {/* World Travel Map Section */}
-        <div id="travel-map" className="mt-16">
-          <WorldTravelMap trips={filteredTrips.length > 0 ? filteredTrips : trips} />
-        </div>
 
       </div>
     </div>
