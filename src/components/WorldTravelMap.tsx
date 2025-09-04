@@ -225,6 +225,18 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
       element: mapRef.current,
       projection: 'mercator',
       responsive: true,
+      // Focus on Asia region
+      setProjection: function(element: any) {
+        const projection = window.d3.geo.mercator()
+          .center([120, 25])  // Center on Asia (longitude: 120°E, latitude: 25°N)
+          .scale(450)          // Zoom level for Asia
+          .translate([element.offsetWidth / 2, element.offsetHeight / 2])
+        
+        const path = window.d3.geo.path()
+          .projection(projection)
+        
+        return { path: path, projection: projection }
+      },
       fills: {
         defaultFill: 'color-mix(in oklab, var(--fallback-b2,oklch(0.86 0.016 240)) 60%, transparent)',
         LOW: 'color-mix(in oklab, var(--fallback-su,oklch(0.66 0.16 156)) 30%, transparent)',
@@ -389,9 +401,9 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
       <div className="card-body">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h2 className="card-title text-2xl mb-2">🌍 Travel Map</h2>
+            <h2 className="card-title text-2xl mb-2">🗾 Asia Travel Map</h2>
             <p className="text-base-content/70">
-              Explore the countries I've visited and discover my travel journey
+              Explore the Asian countries I've visited and discover my travel journey across Asia
             </p>
           </div>
           <div className="stats bg-base-200 shadow-sm mt-4 md:mt-0">
@@ -432,7 +444,7 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
             <div className="flex items-center justify-center h-64 bg-base-200 rounded-lg">
               <div className="text-center">
                 <span className="loading loading-spinner loading-lg text-primary"></span>
-                <p className="mt-2 text-base-content/70">Loading world map...</p>
+                <p className="mt-2 text-base-content/70">Loading Asia map...</p>
               </div>
             </div>
           ) : (
@@ -447,7 +459,7 @@ export function WorldTravelMap({ trips }: WorldTravelMapProps) {
         {totalCountries > 0 && (
           <div className="mt-6 text-center">
             <p className="text-base-content/70">
-              🎯 Hover over highlighted countries to see trip details
+              🎯 Hover over highlighted Asian countries to see trip details
             </p>
           </div>
         )}
