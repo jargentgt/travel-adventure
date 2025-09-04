@@ -1,14 +1,16 @@
 import React from 'react'
 import { Trip, Activity } from '@/types/trip'
 import { TimelineItem } from './TimelineItem'
+import { DayNavigationFooter } from './DayNavigation'
 import { formatShortDate } from '@/utils/dateFormatter'
 
 interface TripTimelineProps {
   trip: Trip
   selectedDay: number
+  onDayChange: (dayIndex: number) => void
 }
 
-export function TripTimeline({ trip, selectedDay }: TripTimelineProps) {
+export function TripTimeline({ trip, selectedDay, onDayChange }: TripTimelineProps) {
 
   // Filter activities to only include Activity objects (not string IDs)
   const activities = trip.days[selectedDay].activities.filter(
@@ -17,7 +19,7 @@ export function TripTimeline({ trip, selectedDay }: TripTimelineProps) {
 
   return (
     <div className="content-container-lg">
-      <div className="card bg-base-100 shadow-xl">
+      <div id="timeline-content" className="card bg-base-100 shadow-xl">
         <div className="card-header p-6 pb-0">
           <h3 className="text-2xl font-bold flex items-center gap-3">
                           <span className="i-mdi-calendar-today w-6 h-6 text-primary"></span>
@@ -41,6 +43,13 @@ export function TripTimeline({ trip, selectedDay }: TripTimelineProps) {
           </ul>
         </div>
       </div>
+      
+      {/* Day Navigation Footer */}
+      <DayNavigationFooter 
+        trip={trip} 
+        selectedDay={selectedDay} 
+        onDayChange={onDayChange} 
+      />
     </div>
   )
 } 

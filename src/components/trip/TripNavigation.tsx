@@ -12,6 +12,14 @@ interface TripNavigationProps {
 
 export function TripNavigation({ previousTrip, nextTrip }: TripNavigationProps) {
 
+  const handleTripNavigation = () => {
+    // Smooth scroll to top when navigating to another trip
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
   const getImageUrl = (coverImage: any): string => {
     if (!coverImage) return ''
     
@@ -41,6 +49,7 @@ export function TripNavigation({ previousTrip, nextTrip }: TripNavigationProps) 
             {previousTrip ? (
               <Link 
                 href={`/trip/${previousTrip.slug}`}
+                onClick={handleTripNavigation}
                 className="group flex items-center gap-4 p-4 rounded-lg bg-base-100 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] max-w-md w-full"
               >
                 <div className="flex-shrink-0">
@@ -86,6 +95,7 @@ export function TripNavigation({ previousTrip, nextTrip }: TripNavigationProps) 
             {nextTrip ? (
               <Link 
                 href={`/trip/${nextTrip.slug}`}
+                onClick={handleTripNavigation}
                 className="group flex items-center gap-4 p-4 rounded-lg bg-base-100 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] max-w-md w-full"
               >
                 <div className="flex-grow min-w-0 text-right">

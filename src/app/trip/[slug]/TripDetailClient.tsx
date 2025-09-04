@@ -141,7 +141,7 @@ export default function TripDetailClient({ slug }: TripDetailClientProps) {
             />
 
             {/* Timeline */}
-            <TripTimeline trip={trip} selectedDay={selectedDay} />
+            <TripTimeline trip={trip} selectedDay={selectedDay} onDayChange={setSelectedDay} />
           </div>
         )}
 

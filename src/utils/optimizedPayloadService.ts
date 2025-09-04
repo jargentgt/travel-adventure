@@ -68,17 +68,17 @@ class OptimizedPayloadService {
    */
   private transformTripListing(trip: any): TripListing {
     return {
-      id: trip.id,
-      title: trip.title,
-      slug: trip.slug,
-      location: trip.location,
-      country: trip.country,
-      startDate: trip.startDate,
-      endDate: trip.endDate,
-      categories: trip.categories || [],
-      tags: trip.tags || [],
+        id: trip.id,
+        title: trip.title,
+        slug: trip.slug,
+        location: trip.location,
+        country: trip.country,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        categories: trip.categories || [],
+        tags: trip.tags || [],
       status: 'published', // Our API only returns published trips
-      coverImage: trip.coverImage ? this.transformImageUrls(trip.coverImage) : undefined,
+        coverImage: trip.coverImage ? this.transformImageUrls(trip.coverImage) : undefined,
       dayCount: trip.daysCount || 0,
       activityCount: trip.totalActivities || 0
     }
@@ -165,14 +165,14 @@ class OptimizedPayloadService {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/frontend/trips/${encodeURIComponent(slug)}`,
-        {
+        { 
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         }
       )
-
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -214,5 +214,5 @@ class OptimizedPayloadService {
 }
 
 // Export singleton instance
-export const optimizedPayloadService = new OptimizedPayloadService()
+export const optimizedPayloadService = new OptimizedPayloadService() 
 export default optimizedPayloadService 
