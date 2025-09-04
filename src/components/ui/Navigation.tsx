@@ -72,7 +72,7 @@ export function Navigation() {
                 All Trips
               </a>
             ) : (
-              <Link href="/">
+              <Link href="/#trip-listing">
                 All Trips
               </Link>
             )}
