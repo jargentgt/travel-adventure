@@ -37,7 +37,7 @@ export const useTripsStore = create<TripsState>((set, get) => ({
     totalDocs: 0,
     totalPages: 0,
     currentPage: 1,
-    limit: 12,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false
   },
@@ -47,7 +47,7 @@ export const useTripsStore = create<TripsState>((set, get) => ({
   cacheExpiry: 5 * 60 * 1000, // 5 minutes
 
   // Fetch trips with caching and pagination
-  fetchTrips: async (page: number = 1, limit: number = 12) => {
+  fetchTrips: async (page: number = 1, limit: number = 20) => {
     const state = get()
     
     // Check if cache is still valid for the same page

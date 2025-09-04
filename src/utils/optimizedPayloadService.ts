@@ -126,7 +126,7 @@ class OptimizedPayloadService {
   /**
    * Get trips using our custom API endpoint with pagination support
    */
-  async getTrips(page: number = 1, limit: number = 12): Promise<{ trips: TripListing[], pagination: any }> {
+  async getTrips(page: number = 1, limit: number = 20): Promise<{ trips: TripListing[], pagination: any }> {
     try {
       const url = new URL(`${this.baseUrl}/api/frontend/trips`)
       url.searchParams.set('page', page.toString())
