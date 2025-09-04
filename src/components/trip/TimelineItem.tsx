@@ -42,15 +42,33 @@ const getTimelineIcon = (category: Activity['category']) => {
 const removeCategoryTags = (description: string): string => {
   if (!description) return description
   
-  // Remove [category] pattern from the beginning of the first line
+  // Remove category markers from the beginning of the first line
   const lines = description.split('\n')
   if (lines.length > 0) {
-    // Remove [category] pattern at the start of the first line
-    lines[0] = lines[0].replace(/^\s*[\[「][^\]」]+[\]」]\s*/, '');
+    const firstLine = lines[0].trim()
+    
+    // Check for category patterns: [{category}], 「{category}], 「{category}」, [{category}」
+    const categoryPatterns = [
+      /^\[([^\]]+)\]/, // [{category}]
+      /^「([^\]]+)\]/, // 「{category}]
+      /^「([^」]+)」/, // 「{category}」
+      /^\[([^」]+)」/  // [{category}」
+    ]
+    
+    let cleanFirstLine = firstLine
+    for (const pattern of categoryPatterns) {
+      if (pattern.test(cleanFirstLine)) {
+        cleanFirstLine = cleanFirstLine.replace(pattern, '').trim()
+        break
+      }
+    }
+    
+    lines[0] = cleanFirstLine
   }
   
   // Join back and remove any empty lines at the beginning
-  return lines.join('\n').replace(/^\s*\n+/, '')
+  const result = lines.join('\n').replace(/^\s*\n+/, '').trim()
+  return result
 }
 
 const formatDescription = (description: string, category: Activity['category']) => {
