@@ -26,6 +26,7 @@ interface TripsState {
   
   // Actions
   fetchTrips: (page?: number, limit?: number) => Promise<void>
+  fetchAllTrips: () => Promise<void>
   clearCache: () => void
   setError: (error: string | null) => void
 }
@@ -37,7 +38,7 @@ export const useTripsStore = create<TripsState>((set, get) => ({
     totalDocs: 0,
     totalPages: 0,
     currentPage: 1,
-    limit: 20,
+    limit: 12,
     hasNextPage: false,
     hasPrevPage: false
   },
@@ -47,7 +48,7 @@ export const useTripsStore = create<TripsState>((set, get) => ({
   cacheExpiry: 5 * 60 * 1000, // 5 minutes
 
   // Fetch trips with caching and pagination
-  fetchTrips: async (page: number = 1, limit: number = 20) => {
+  fetchTrips: async (page: number = 1, limit: number = 12) => {
     const state = get()
     
     // Check if cache is still valid for the same page
@@ -71,7 +72,7 @@ export const useTripsStore = create<TripsState>((set, get) => ({
 
     try {
       console.log(`🚀 Fetching trips data for page ${page}...`)
-      const response = await optimizedPayloadService.getTrips(page, limit)
+      const response = await optimizedPayloadService.getTrips(page, limit, false)
       
       set({ 
         trips: response.trips, 
@@ -101,6 +102,50 @@ export const useTripsStore = create<TripsState>((set, get) => ({
     }
   },
 
+  // Fetch all trips (for development or special cases)
+  fetchAllTrips: async () => {
+    const state = get()
+    
+    // Prevent multiple simultaneous calls
+    if (state.isLoading) {
+      console.log('🚀 API call already in progress, skipping...')
+      return
+    }
+
+    set({ isLoading: true, error: null })
+
+    try {
+      console.log('🚀 Fetching all trips data...')
+      const response = await optimizedPayloadService.getTrips(1, 100, true)
+      
+      set({ 
+        trips: response.trips,
+        pagination: {
+          totalDocs: response.pagination.totalDocs,
+          totalPages: 1, // All trips on one page
+          currentPage: 1,
+          limit: response.trips.length,
+          hasNextPage: false,
+          hasPrevPage: false
+        },
+        isLoading: false, 
+        error: null,
+        lastFetchTime: Date.now()
+      })
+      
+      console.log('✅ All trips data loaded:', response.trips.length)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load all trips'
+      console.error('❌ Error fetching all trips:', error)
+      
+      set({ 
+        isLoading: false, 
+        error: errorMessage,
+        lastFetchTime: null 
+      })
+    }
+  },
+
   // Clear cache (useful for refreshing data)
   clearCache: () => {
     set({ lastFetchTime: null })
@@ -118,6 +163,7 @@ export const useTripsPagination = () => useTripsStore((state) => state.paginatio
 export const useTripsLoading = () => useTripsStore((state) => state.isLoading)
 export const useTripsError = () => useTripsStore((state) => state.error)
 export const useFetchTrips = () => useTripsStore((state) => state.fetchTrips)
+export const useFetchAllTrips = () => useTripsStore((state) => state.fetchAllTrips)
 export const useClearTripsCache = () => useTripsStore((state) => state.clearCache)
 
 // Combined selectors for convenience (but use sparingly to avoid re-renders)
@@ -129,5 +175,6 @@ export const useTripsData = () => ({
 
 export const useTripsActions = () => ({
   fetchTrips: useFetchTrips(),
+  fetchAllTrips: useFetchAllTrips(),
   clearCache: useClearTripsCache(),
 }) 

@@ -126,11 +126,18 @@ class OptimizedPayloadService {
   /**
    * Get trips using our custom API endpoint with pagination support
    */
-  async getTrips(page: number = 1, limit: number = 20): Promise<{ trips: TripListing[], pagination: any }> {
+  async getTrips(page: number = 1, limit: number = 12, getAllForBuild: boolean = false): Promise<{ trips: TripListing[], pagination: any }> {
     try {
       const url = new URL(`${this.baseUrl}/api/frontend/trips`)
-      url.searchParams.set('page', page.toString())
-      url.searchParams.set('limit', limit.toString())
+      
+      // For build time, get all trips in one request to ensure all pages are generated
+      if (getAllForBuild) {
+        url.searchParams.set('page', '1')
+        url.searchParams.set('limit', '100') // High limit to get all trips
+      } else {
+        url.searchParams.set('page', page.toString())
+        url.searchParams.set('limit', limit.toString())
+      }
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -168,6 +175,19 @@ class OptimizedPayloadService {
     } catch (error) {
       console.error('Error fetching trips:', error)
       throw error
+    }
+  }
+
+  /**
+   * Get all trips for build time (static generation)
+   */
+  async getAllTripsForBuild(): Promise<TripListing[]> {
+    try {
+      const response = await this.getTrips(1, 100, true)
+      return response.trips
+    } catch (error) {
+      console.error('Error fetching all trips for build:', error)
+      return []
     }
   }
 

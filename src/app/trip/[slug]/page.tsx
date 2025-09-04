@@ -12,9 +12,9 @@ export async function generateStaticParams() {
   }
 
   try {
-    // For production builds, always use the Railway production URL
+    // For production builds, always use the Railway production URL and get ALL trips
     const apiUrl = 'https://travel-cms-production.up.railway.app'
-    const response = await fetch(`${apiUrl}/api/frontend/trips`, {
+    const response = await fetch(`${apiUrl}/api/frontend/trips?limit=100`, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
