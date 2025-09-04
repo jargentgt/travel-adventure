@@ -1,6 +1,7 @@
 import React from 'react'
 import { Trip, Activity } from '@/types/trip'
 import { TimelineItem } from './TimelineItem'
+import { formatShortDate } from '@/utils/dateFormatter'
 
 interface TripTimelineProps {
   trip: Trip
@@ -8,14 +9,6 @@ interface TripTimelineProps {
 }
 
 export function TripTimeline({ trip, selectedDay }: TripTimelineProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
 
   // Filter activities to only include Activity objects (not string IDs)
   const activities = trip.days[selectedDay].activities.filter(
@@ -28,7 +21,7 @@ export function TripTimeline({ trip, selectedDay }: TripTimelineProps) {
         <div className="card-header p-6 pb-0">
           <h3 className="text-2xl font-bold flex items-center gap-3">
                           <span className="i-mdi-calendar-today w-6 h-6 text-primary"></span>
-            {formatDate(trip.days[selectedDay].date)}
+            {formatShortDate(trip.days[selectedDay].date)}
           </h3>
         </div>
         <div className="card-body">

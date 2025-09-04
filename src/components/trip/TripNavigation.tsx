@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Trip } from '@/types/trip'
+import { formatShortDate } from '@/utils/dateFormatter'
 
 interface TripNavigationProps {
   previousTrip?: Trip | null
@@ -10,13 +11,6 @@ interface TripNavigationProps {
 }
 
 export function TripNavigation({ previousTrip, nextTrip }: TripNavigationProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
 
   const getImageUrl = (coverImage: any): string => {
     if (!coverImage) return ''
@@ -73,7 +67,7 @@ export function TripNavigation({ previousTrip, nextTrip }: TripNavigationProps) 
                     {previousTrip.title}
                   </h3>
                   <p className="text-sm text-base-content/60">
-                    {formatDate(previousTrip.startDate)}
+                    {formatShortDate(previousTrip.startDate)}
                   </p>
                 </div>
               </Link>
@@ -103,7 +97,7 @@ export function TripNavigation({ previousTrip, nextTrip }: TripNavigationProps) 
                     {nextTrip.title}
                   </h3>
                   <p className="text-sm text-base-content/60">
-                    {formatDate(nextTrip.startDate)}
+                    {formatShortDate(nextTrip.startDate)}
                   </p>
                 </div>
                 <div className="flex-shrink-0">

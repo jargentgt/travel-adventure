@@ -1,19 +1,12 @@
 import React from 'react'
 import { Trip } from '@/types/trip'
+import { formatDateRange, formatShortDate } from '@/utils/dateFormatter'
 
 interface TripInfoProps {
   trip: Trip
 }
 
 export function TripInfo({ trip }: TripInfoProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
 
   const stats = {
     totalDays: trip.days.length,
@@ -52,7 +45,7 @@ export function TripInfo({ trip }: TripInfoProps) {
             <div>
               <h4 className="font-bold mb-2">Trip Duration</h4>
               <p className="text-sm">
-                {formatDate(trip.startDate)} - {formatDate(trip.endDate)} ({stats.totalDays} days)
+                {formatDateRange(trip.startDate, trip.endDate)} ({stats.totalDays} days)
               </p>
             </div>
 

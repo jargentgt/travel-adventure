@@ -237,7 +237,7 @@ export function TimelineItem({ activity, index, isShifted }: TimelineItemProps) 
             {getRainPlanIndicator()}
             {getCategoryBadge()}
             <div className="card-body gap-4">
-              <h5 className="card-title text-lg">{activity.title}</h5>
+              <h5 className="card-title text-lg pr-20">{activity.title}</h5>
               
               {activity.location && (
                 <div className="flex items-center gap-2 text-sm text-base-content/70">
@@ -311,7 +311,7 @@ export function TimelineItem({ activity, index, isShifted }: TimelineItemProps) 
             {getRainPlanIndicator()}
             {getCategoryBadge()}
             <div className="card-body gap-4">
-              <h5 className="card-title text-lg">{activity.title}</h5>
+              <h5 className="card-title text-lg pr-20">{activity.title}</h5>
               
               {activity.location && (
                 <div className="flex items-center gap-2 text-sm text-base-content/70">

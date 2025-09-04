@@ -6,6 +6,7 @@ import { FilterOptions } from '@/types/trip'
 import { LoadingScreen, LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { WorldTravelMap } from '@/components/WorldTravelMap'
 import { useTrips, useTripsLoading, useTripsError, useFetchTrips } from '@/stores/tripsStore'
+import { formatDateRange, formatShortDate } from '@/utils/dateFormatter'
 
 
 export default function HomePage() {
@@ -58,13 +59,6 @@ export default function HomePage() {
 
   const clearFilters = () => {
     setFilters({ year: '', country: '' })
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    })
   }
 
   const getDuration = (startDate: string, endDate: string) => {
@@ -391,7 +385,7 @@ export default function HomePage() {
                       <div className="stat px-3 py-2">
                         <div className="stat-title text-xs">Date</div>
                         <div className="stat-value text-sm">
-                          {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                          {formatDateRange(trip.startDate, trip.endDate)}
                         </div>
                       </div>
                     </div>
