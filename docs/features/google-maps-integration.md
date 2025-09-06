@@ -15,9 +15,22 @@ The trip detail map has been upgraded from OpenStreetMap/Leaflet to Google Maps 
 ### 📍 Enhanced Pin Placement & Visibility
 - **Full Address Geocoding**: Uses complete location addresses with region biasing for maximum accuracy
 - **URL Coordinate Extraction**: Automatically extracts coordinates from Google Maps URLs in activity descriptions
-- **Classic Google Maps Pins**: Standard teardrop-shaped pins with white center dot
-- **Category Color Coding**: Pin background colors based on activity type (restaurant=orange, hotel=purple, etc.)
-- **Permanent Activity Labels**: Activity titles displayed below each pin for instant identification
+- **Category-Colored Teardrop Pins**: Beautiful custom SVG pins with category colors and embedded time order numbers
+- **Time-Based Numbering**: Pins show chronological order (1, 2, 3...) for easy itinerary following
+- **Category Color Coding**: Pin colors based on activity type (restaurant=orange, hotel=pink, activity=green, etc.)
+
+### 🛣️ Smart Polyline Routes
+- **Connecting Lines**: Visual lines connecting activity pins in chronological order
+- **Day-Colored Routes**: Each day has its own colored polyline with directional arrows
+- **Zoom-Adaptive Display**: Lines appear when zoomed in (≥13), hidden when zoomed out for clarity
+- **Smart Clustering Integration**: Polylines work seamlessly with marker clustering logic
+
+### 🎯 Checkpoint Navigation
+- **Overview First**: Map initially displays all locations for full context (Step 0)
+- **Opt-in Experience**: "Start Tour" button provides choice to enter guided mode
+- **Step-by-Step Guide**: Navigate through activities in chronological order with Next/Prev buttons
+- **Smart Focus**: Automatically centers map on selected checkpoint with optimal zoom
+- **Progress Tracking**: Visual indicator shows current checkpoint position and activity name
 - **Marker Clustering**: Nearby pins are automatically grouped into clusters for better visibility
 
 ### 🗓️ Day Navigation
@@ -79,8 +92,23 @@ Visit a trip page and click the "Map" tab to see the Google Maps integration.
    - **Pin Design**: Category-colored teardrops with white circles containing chronological order numbers
    - **Hover Tooltips**: Full activity names appear when you mouse over pins
    - **Advantage**: Combines visual beauty with functional labels - no compromises needed!
-5. **Interactive Pins**: Click any pin to see detailed activity information in an info popup
-6. **Focus from Timeline**: Use "View on map" buttons in the timeline tab to switch to map and focus on specific activities
+5. **Follow Route Lines**: 
+   - **Zoom In (≥13)**: Connected lines appear between pins showing your travel route in chronological order
+   - **Directional Arrows**: Lines include arrows showing the direction of travel
+   - **Day Colors**: Each day has its own colored route line matching the day theme
+   - **Zoom Out (<13)**: Lines automatically hide for cleaner overview, clustering may activate
+6. **Smart Zoom Behavior**:
+   - **Overview Mode**: Zoomed out shows clustered pins for general area awareness
+   - **Detail Mode**: Zoomed in shows individual pins with connecting route lines
+   - **Auto-fit**: Changing days automatically fits the map to show that day's activities
+7. **Checkpoint Navigation**: 
+   - **Overview First**: Map initially shows all locations in normal view (Step 0)
+   - **Start Tour**: Large "Start Tour" button for opt-in guided experience
+   - **Step-by-Step Guide**: Use "Next Checkpoint" and "Prev Checkpoint" buttons to follow your itinerary in chronological order  
+   - **Smart Focus**: Each checkpoint smoothly centers the map on the activity pin and shows details
+   - **Progress Indicator**: Shows current position (e.g., "2 / 5") and activity name
+8. **Interactive Pins**: Click any pin to see detailed activity information in an info popup
+9. **Focus from Timeline**: Use "View on map" buttons in the timeline tab to switch to map and focus on specific activities
 
 ## Technical Implementation
 

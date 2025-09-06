@@ -43,33 +43,44 @@ const getTimelineIcon = (category: Activity['category']) => {
 const removeCategoryTags = (description: string): string => {
   if (!description) return description
   
-  // Remove category markers from the beginning of the first line
+  // Enhanced category patterns to match all possible formats
+  const categoryPatterns = [
+    /^\s*\[([^\]]+)\]\s*/, // [category] with optional whitespace
+    /^\s*「([^」]+)」\s*/, // 「category」with optional whitespace  
+    /^\s*「([^\]]+)\]\s*/, // 「category] with optional whitespace
+    /^\s*\[([^」]+)」\s*/  // [category」with optional whitespace
+  ]
+  
+  // Split into lines and process each line that might contain category markers
   const lines = description.split('\n')
-  if (lines.length > 0) {
-    const firstLine = lines[0].trim()
+  
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i]
+    let foundMatch = false
     
-    // Check for category patterns: [{category}], 「{category}], 「{category}」, [{category}」
-    const categoryPatterns = [
-      /^\[([^\]]+)\]/, // [{category}]
-      /^「([^\]]+)\]/, // 「{category}]
-      /^「([^」]+)」/, // 「{category}」
-      /^\[([^」]+)」/  // [{category}」
-    ]
-    
-    let cleanFirstLine = firstLine
+    // Check each pattern against the current line
     for (const pattern of categoryPatterns) {
-      if (pattern.test(cleanFirstLine)) {
-        cleanFirstLine = cleanFirstLine.replace(pattern, '').trim()
+      if (pattern.test(line)) {
+        line = line.replace(pattern, '').trim()
+        foundMatch = true
         break
       }
     }
     
-    lines[0] = cleanFirstLine
+    lines[i] = line
+    
+    // If we found a marker on an otherwise empty line, remove the entire line
+    if (foundMatch && !line) {
+      lines.splice(i, 1)
+      i-- // Adjust index after removal
+    }
   }
   
-  // Join back and remove any empty lines at the beginning
-  const result = lines.join('\n').replace(/^\s*\n+/, '').trim()
-  return result
+  // Join back and clean up any resulting empty lines
+  return lines
+    .filter(line => line.trim() !== '') // Remove empty lines
+    .join('\n')
+    .trim()
 }
 
 const formatDescription = (description: string, category: Activity['category']) => {

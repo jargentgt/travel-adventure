@@ -28,9 +28,12 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
   const [mapInstance, setMapInstance] = useState<any>(null)
   const [markers, setMarkers] = useState<Map<string, any>>(new Map())
   const [markerClusterer, setMarkerClusterer] = useState<MarkerClusterer | null>(null)
+  const [polylines, setPolylines] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [currentZoom, setCurrentZoom] = useState<number>(12)
   const [userHasInteracted, setUserHasInteracted] = useState(false)
+  const [currentCheckpoint, setCurrentCheckpoint] = useState<number>(0) // Track current checkpoint index
+  const [tourStarted, setTourStarted] = useState<boolean>(false) // Track if guided tour has started
 
 
 
@@ -74,11 +77,154 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
     return categoryMap[normalizedCategory] || categoryMap.default
   }
 
+  // Helper function to get day color for polylines
+  const getDayColor = (dayIndex: number): string => {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F']
+    return colors[dayIndex % colors.length]
+  }
+
+  // Helper function to determine if polylines should be visible based on zoom
+  const shouldShowPolylines = (zoomLevel: number): boolean => {
+    return zoomLevel >= 13 // Show lines when zoomed in enough for detail
+  }
+
+  // Helper function to determine if clustering should be enabled
+  const shouldEnableClustering = (zoomLevel: number, activityCount: number): boolean => {
+    return zoomLevel < 13 && activityCount > 6 // Cluster when zoomed out and many activities
+  }
+
+  // Function to create polyline for a set of coordinates
+  const createPolylineForCoordinates = (coordinates: { lat: number, lng: number }[], dayIndex: number): any | null => {
+    if (!window.google || coordinates.length < 2) return null
+
+    return new window.google.maps.Polyline({
+      path: coordinates,
+      geodesic: true,
+      strokeColor: getDayColor(dayIndex),
+      strokeOpacity: 0.8,
+      strokeWeight: 3,
+      icons: [{
+        icon: {
+          path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          scale: 3,
+          fillColor: getDayColor(dayIndex),
+          fillOpacity: 0.8,
+          strokeColor: '#ffffff',
+          strokeWeight: 1
+        },
+        offset: '50%',
+        repeat: '200px'
+      }]
+    })
+  }
+
+  // Function to fit map to day's activities using existing markers
+  const fitMapToDay = (dayIndex: number) => {
+    if (!mapInstance || !trip.days[dayIndex]?.activities) return
+
+    // Get marker positions from the current markers Map
+    const markerPositions: { lat: number, lng: number }[] = []
+    markers.forEach(marker => {
+      if (marker.getVisible()) {
+        const position = marker.getPosition()
+        if (position) {
+          markerPositions.push({
+            lat: position.lat(),
+            lng: position.lng()
+          })
+        }
+      }
+    })
+    
+    if (markerPositions.length === 0) return
+
+    const bounds = new window.google.maps.LatLngBounds()
+    markerPositions.forEach(position => {
+      bounds.extend(position)
+    })
+
+    // Add some padding to the bounds
+    mapInstance.fitBounds(bounds, { 
+      padding: { top: 50, right: 50, bottom: 50, left: 50 } 
+    })
+  }
 
 
 
 
 
+
+
+  // Checkpoint navigation functions
+  const focusOnCheckpoint = (checkpointIndex: number) => {
+    if (!mapInstance || markers.size === 0) return
+
+    const activitiesWithLocations = getActivitiesWithLocations()
+    if (checkpointIndex < 0 || checkpointIndex >= activitiesWithLocations.length) return
+
+    const activity = activitiesWithLocations[checkpointIndex]
+    const marker = markers.get(activity.id)
+    
+    if (marker) {
+      // Close all existing info windows first
+      markers.forEach((m) => {
+        if (m.infoWindow) {
+          m.infoWindow.close()
+        }
+      })
+
+      // Center map on the checkpoint marker with smooth animation
+      mapInstance.panTo(marker.getPosition())
+      
+      // Set appropriate zoom for checkpoint focus
+      const targetZoom = Math.max(15, currentZoom) // Ensure we're zoomed in enough to see details
+      if (mapInstance.getZoom() !== targetZoom) {
+        mapInstance.setZoom(targetZoom)
+      }
+      
+      // Open info window for this checkpoint
+      if (marker.infoWindow) {
+        setTimeout(() => {
+          marker.infoWindow.open(mapInstance, marker)
+        }, 500) // Delay to allow map animation to complete
+      }
+      
+      // Update current checkpoint
+      setCurrentCheckpoint(checkpointIndex)
+      
+      // Trigger activity focus callback
+      if (onActivityFocus) {
+        onActivityFocus(activity.id)
+      }
+      
+      console.log(`📍 Focused on checkpoint ${checkpointIndex + 1}: ${activity.title}`)
+    }
+  }
+
+  const goToNextCheckpoint = () => {
+    const activitiesWithLocations = getActivitiesWithLocations()
+    const nextIndex = Math.min(currentCheckpoint + 1, activitiesWithLocations.length - 1)
+    focusOnCheckpoint(nextIndex)
+  }
+
+  const goToPrevCheckpoint = () => {
+    const prevIndex = Math.max(currentCheckpoint - 1, 0)
+    focusOnCheckpoint(prevIndex)
+  }
+
+  // Start guided tour
+  const startTour = () => {
+    setTourStarted(true)
+    setCurrentCheckpoint(0)
+    focusOnCheckpoint(0)
+    console.log('🧭 Started guided tour - focusing on first checkpoint')
+  }
+
+  // Reset checkpoint and tour when day changes
+  const resetCheckpointOnDayChange = () => {
+    setCurrentCheckpoint(0)
+    setTourStarted(false)
+  }
 
   // Load Google Maps (only when user explicitly requests it)
   useEffect(() => {
@@ -218,7 +364,10 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
     const activitiesWithLocations = getActivitiesWithLocations()
     console.log(`🗓️  Day ${selectedDay + 1}: Adding markers for ${activitiesWithLocations.length} activities`)
     
-    // Always clear existing markers and labels when day changes
+    // Reset checkpoint to first activity when day changes
+    resetCheckpointOnDayChange()
+    
+    // Always clear existing markers, polylines, and clustering when day changes
     if (markerClusterer) {
       markerClusterer.clearMarkers()
       setMarkerClusterer(null)
@@ -227,6 +376,12 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
       marker.setMap(null)
     })
     setMarkers(new Map())
+    
+    // Clear existing polylines
+    polylines.forEach(polyline => {
+      polyline.setMap(null)
+    })
+    setPolylines([])
     
 
     
@@ -397,16 +552,52 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
       console.log(`✅ Day ${selectedDay + 1}: Successfully geocoded ${successCount} out of ${activitiesWithLocations.length} activities`)
       setMarkers(newMarkers)
 
-              // Create marker clusterer with label visibility callback
-        if (newMarkers.size > 0) {
+      if (newMarkers.size > 0) {
+        // Get coordinates for polyline creation
+        const coordinates: { lat: number, lng: number }[] = []
+        activitiesWithLocations.forEach((activity, index) => {
+          const marker = newMarkers.get(activity.id)
+          if (marker) {
+            const position = marker.getPosition()
+            if (position) {
+              coordinates.push({
+                lat: position.lat(),
+                lng: position.lng()
+              })
+            }
+          }
+        })
+
+        // Apply smart clustering and polyline logic
+        const currentZoom = mapInstance.getZoom() || 12
+        const enableClustering = shouldEnableClustering(currentZoom, newMarkers.size)
+        const showPolylines = shouldShowPolylines(currentZoom)
+
+        // Create marker clustering if needed
+        if (enableClustering) {
           const clusterer = new MarkerClusterer({
             map: mapInstance,
             markers: Array.from(newMarkers.values()),
           })
-          
           setMarkerClusterer(clusterer)
-          
+          console.log(`🔗 Day ${selectedDay + 1}: Clustering enabled (${newMarkers.size} markers)`)
+        } else {
+          console.log(`📍 Day ${selectedDay + 1}: Individual markers shown (${newMarkers.size} markers)`)
+        }
 
+        // Create and show polylines if conditions are met
+        if (showPolylines && coordinates.length >= 2) {
+          const polyline = createPolylineForCoordinates(coordinates, selectedDay)
+          if (polyline) {
+            polyline.setMap(mapInstance)
+            setPolylines([polyline])
+            console.log(`🛣️  Day ${selectedDay + 1}: Route polyline created with ${coordinates.length} points`)
+          }
+        } else if (coordinates.length < 2) {
+          console.log(`🛣️  Day ${selectedDay + 1}: Not enough coordinates for polyline (${coordinates.length} points)`)
+        } else {
+          console.log(`🛣️  Day ${selectedDay + 1}: Polyline hidden due to zoom level (${currentZoom})`)
+        }
 
         // Fit map to show all markers with proper padding
         if (!bounds.isEmpty()) {
@@ -417,11 +608,19 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
             left: 50
           })
           
-          // Ensure minimum zoom level for better visibility
+          // Ensure minimum zoom level for better visibility, but allow polylines to show
           const listener = window.google.maps.event.addListenerOnce(mapInstance, 'bounds_changed', () => {
-            if (mapInstance.getZoom() > 16) {
+            const newZoom = mapInstance.getZoom()
+            if (newZoom && newZoom > 16) {
               mapInstance.setZoom(16)
             }
+            // Auto-zoom to show polylines if we have few activities
+            else if (newZoom && newZoom < 13 && newMarkers.size <= 6) {
+              mapInstance.setZoom(14) // Sweet spot for showing both markers and lines
+            }
+
+            // Map initialization complete - ready for user interaction
+            console.log('🗺️ Map initialization complete - showing overview of all activities')
           })
         }
       } else {
@@ -429,6 +628,94 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
       }
     })
   }, [mapInstance, selectedDay])
+
+  // Handle zoom changes for dynamic polyline and clustering behavior
+  useEffect(() => {
+    if (!mapInstance || !window.google || markers.size === 0) return
+
+    const handleZoomChanged = () => {
+      const currentZoom = mapInstance.getZoom() || 12
+      setCurrentZoom(currentZoom)
+      
+      const enableClustering = shouldEnableClustering(currentZoom, markers.size)
+      const showPolylines = shouldShowPolylines(currentZoom)
+
+      // Handle clustering changes
+      if (enableClustering && !markerClusterer) {
+        // Enable clustering
+        const clusterer = new MarkerClusterer({
+          map: mapInstance,
+          markers: Array.from(markers.values()),
+        })
+        setMarkerClusterer(clusterer)
+        console.log(`🔗 Zoom ${currentZoom}: Clustering enabled`)
+      } else if (!enableClustering && markerClusterer) {
+        // Disable clustering
+        markerClusterer.clearMarkers()
+        setMarkerClusterer(null)
+        // Re-add markers individually
+        markers.forEach(marker => {
+          marker.setMap(mapInstance)
+        })
+        console.log(`📍 Zoom ${currentZoom}: Individual markers shown`)
+      }
+
+      // Handle polyline visibility
+      if (showPolylines && polylines.length === 0) {
+        // Show polylines - recreate them from current marker positions
+        const coordinates: { lat: number, lng: number }[] = []
+        markers.forEach(marker => {
+          if (marker.getVisible()) {
+            const position = marker.getPosition()
+            if (position) {
+              coordinates.push({
+                lat: position.lat(),
+                lng: position.lng()
+              })
+            }
+          }
+        })
+        
+        if (coordinates.length >= 2) {
+          const polyline = createPolylineForCoordinates(coordinates, selectedDay)
+          if (polyline) {
+            polyline.setMap(mapInstance)
+            setPolylines([polyline])
+            console.log(`🛣️  Zoom ${currentZoom}: Polyline shown`)
+          }
+        }
+      } else if (!showPolylines && polylines.length > 0) {
+        // Hide polylines
+        polylines.forEach(polyline => {
+          polyline.setMap(null)
+        })
+        setPolylines([])
+        console.log(`🛣️  Zoom ${currentZoom}: Polyline hidden`)
+      }
+    }
+
+    // Add zoom change listener
+    const listener = mapInstance.addListener('zoom_changed', handleZoomChanged)
+
+    // Cleanup
+    return () => {
+      if (listener) {
+        window.google.maps.event.removeListener(listener)
+      }
+    }
+  }, [mapInstance, markers, markerClusterer, polylines, selectedDay])
+
+  // Auto-fit map to day's activities when selectedDay changes
+  useEffect(() => {
+    if (!mapInstance || markers.size === 0) return
+
+    // Add a small delay to ensure markers are rendered
+    const timeoutId = setTimeout(() => {
+      fitMapToDay(selectedDay)
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [selectedDay, mapInstance, markers])
 
   // Handle focused activity
   useEffect(() => {
@@ -575,7 +862,62 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
             style={{ minHeight: '500px' }}
           />
           
-                          {/* Legend */}
+          {/* Checkpoint Navigation */}
+          {activitiesWithLocations.length > 0 && (
+            <div className="mt-4 flex justify-center items-center gap-4 p-4 bg-base-200 rounded-lg">
+              {!tourStarted ? (
+                /* Start Tour Button */
+                <div className="flex flex-col items-center gap-3">
+                  <div className="text-center">
+                    <h4 className="text-sm font-semibold text-base-content">Ready for a guided tour?</h4>
+                    <p className="text-xs text-base-content/60 mt-1">
+                      Follow your itinerary step-by-step with {activitiesWithLocations.length} checkpoints
+                    </p>
+                  </div>
+                  <button 
+                    className="btn btn-primary btn-lg"
+                    onClick={startTour}
+                  >
+                    <span className="i-mdi-play-circle w-5 h-5"></span>
+                    Start Tour
+                  </button>
+                </div>
+              ) : (
+                /* Normal Checkpoint Navigation */
+                <>
+                  <button 
+                    className={`btn btn-sm ${currentCheckpoint === 0 ? 'btn-disabled' : 'btn-primary'}`}
+                    onClick={goToPrevCheckpoint}
+                    disabled={currentCheckpoint === 0}
+                  >
+                    <span className="i-mdi-chevron-left w-4 h-4"></span>
+                    Prev Checkpoint
+                  </button>
+                  
+                  <div className="flex items-center gap-2 px-4 py-2 bg-base-100 rounded-lg shadow-inner">
+                    <span className="i-mdi-map-marker w-4 h-4 text-primary"></span>
+                    <span className="text-sm font-medium">
+                      {currentCheckpoint + 1} / {activitiesWithLocations.length}
+                    </span>
+                    <span className="text-xs text-base-content/60">
+                      {activitiesWithLocations[currentCheckpoint]?.title}
+                    </span>
+                  </div>
+                  
+                  <button 
+                    className={`btn btn-sm ${currentCheckpoint === activitiesWithLocations.length - 1 ? 'btn-disabled' : 'btn-primary'}`}
+                    onClick={goToNextCheckpoint}
+                    disabled={currentCheckpoint === activitiesWithLocations.length - 1}
+                  >
+                    Next Checkpoint
+                    <span className="i-mdi-chevron-right w-4 h-4"></span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+          
+          {/* Legend */}
                 <div className="mt-4 p-4 bg-base-200 rounded-lg">
                   <h4 className="text-sm font-semibold mb-2">Day {selectedDay + 1} Activity Types</h4>
                   <div className="flex flex-wrap gap-3 text-xs">
