@@ -8,6 +8,7 @@ interface TripTabsProps {
 export function TripTabs({ activeTab, onTabChange }: TripTabsProps) {
   const tabs = [
       { id: 'timeline', label: 'Timeline', iconClass: 'i-mdi-timeline-clock' },
+      { id: 'map', label: 'Map', iconClass: 'i-mdi-map' },
   { id: 'gallery', label: 'Gallery', iconClass: 'i-mdi-image-multiple' },
   { id: 'info', label: 'Info', iconClass: 'i-mdi-information' }
   ]

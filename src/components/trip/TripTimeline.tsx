@@ -8,9 +8,10 @@ interface TripTimelineProps {
   trip: Trip
   selectedDay: number
   onDayChange: (dayIndex: number) => void
+  onMapPinClick?: (activityId: string) => void
 }
 
-export function TripTimeline({ trip, selectedDay, onDayChange }: TripTimelineProps) {
+export function TripTimeline({ trip, selectedDay, onDayChange, onMapPinClick }: TripTimelineProps) {
 
   // Filter activities to only include Activity objects (not string IDs)
   const activities = trip.days[selectedDay].activities.filter(
@@ -37,6 +38,7 @@ export function TripTimeline({ trip, selectedDay, onDayChange }: TripTimelinePro
                   activity={activity}
                   index={index}
                   isShifted={isShifted}
+                  onMapPinClick={onMapPinClick}
                 />
               )
             })}

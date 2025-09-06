@@ -16,8 +16,10 @@ import {
   TripTimeline,
   TripGallery,
   TripInfo,
-  TripNavigation
+  TripNavigation,
+  TripDetailMap
 } from '@/components/trip'
+import { ApiUsageMonitorComponent } from '@/components/dev/ApiUsageMonitor'
 
 interface TripDetailClientProps {
   slug: string
@@ -37,6 +39,7 @@ export default function TripDetailClient({ slug }: TripDetailClientProps) {
   const [selectedDay, setSelectedDay] = useState(0)
   const [previousTrip, setPreviousTrip] = useState<Trip | null>(null)
   const [nextTrip, setNextTrip] = useState<Trip | null>(null)
+  const [focusedActivityId, setFocusedActivityId] = useState<string | null>(null)
 
   useEffect(() => {
     if (slug) {
@@ -110,6 +113,20 @@ export default function TripDetailClient({ slug }: TripDetailClientProps) {
     )
   }
 
+  // Handle map pin click - switch to map tab and focus on activity
+  const handleMapPinClick = (activityId: string) => {
+    setActiveTab('map')
+    setFocusedActivityId(activityId)
+    
+    // Smooth scroll to the map
+    setTimeout(() => {
+      const element = document.getElementById('trip-map')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 100) // Small delay to ensure tab switch completes
+  }
+
   // Main trip detail page
   return (
     <div className="min-h-screen bg-base-100">
@@ -141,7 +158,31 @@ export default function TripDetailClient({ slug }: TripDetailClientProps) {
             />
 
             {/* Timeline */}
-            <TripTimeline trip={trip} selectedDay={selectedDay} onDayChange={setSelectedDay} />
+            <TripTimeline 
+              trip={trip} 
+              selectedDay={selectedDay} 
+              onDayChange={setSelectedDay} 
+              onMapPinClick={handleMapPinClick}
+            />
+          </div>
+        )}
+
+        {activeTab === 'map' && (
+          <div id="trip-map">
+            {/* Day Navigation for Map */}
+            <DayNavigation
+              trip={trip}
+              selectedDay={selectedDay}
+              onDayChange={setSelectedDay}
+            />
+
+            <TripDetailMap 
+              trip={trip} 
+              selectedDay={selectedDay} 
+              focusedActivityId={focusedActivityId}
+              onActivityFocus={setFocusedActivityId}
+              isVisible={activeTab === 'map'}
+            />
           </div>
         )}
 
@@ -152,6 +193,9 @@ export default function TripDetailClient({ slug }: TripDetailClientProps) {
 
       {/* Trip Navigation */}
       <TripNavigation previousTrip={previousTrip} nextTrip={nextTrip} />
+      
+      {/* API Usage Monitor (dev only) */}
+      <ApiUsageMonitorComponent />
     </div>
   )
 } 

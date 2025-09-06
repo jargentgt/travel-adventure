@@ -11,6 +11,7 @@ assets/
 .env*
 out/
 .firebase/*
+.firebase/hosting*
 
 # Compiled Java class files
 *.class

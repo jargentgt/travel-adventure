@@ -11,6 +11,8 @@
     "deploy:hosting": "npm run build && firebase deploy --only hosting"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.10",
+    "@googlemaps/markerclusterer": "^2.6.2",
     "datamaps": "^0.5.9",
     "firebase": "^12.1.0",
     "next": "14.0.4",

@@ -6,6 +6,7 @@ interface TimelineItemProps {
   activity: Activity
   index: number
   isShifted: boolean
+  onMapPinClick?: (activityId: string) => void
 }
 
 // Helper functions for description formatting  
@@ -102,7 +103,7 @@ const formatDescription = (description: string, category: Activity['category']) 
   return `${icon} <br/>${bulletPoints}`
 }
 
-export function TimelineItem({ activity, index, isShifted }: TimelineItemProps) {
+export function TimelineItem({ activity, index, isShifted, onMapPinClick }: TimelineItemProps) {
   const formattedDescription = activity.description ? formatDescription(activity.description, activity.category) : ''
   
   // Count actual content lines and check length (before HTML formatting)
@@ -275,6 +276,16 @@ export function TimelineItem({ activity, index, isShifted }: TimelineItemProps) 
                   >
                     <span className="i-mdi-content-copy w-3 h-3"></span>
                   </button>
+                  {onMapPinClick && (
+                    <button
+                      className="btn btn-primary btn-xs ml-2"
+                      onClick={() => onMapPinClick(activity.id)}
+                      title="View this location on map"
+                    >
+                      <span className="i-mdi-map w-3 h-3"></span>
+                      View on map
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -349,6 +360,16 @@ export function TimelineItem({ activity, index, isShifted }: TimelineItemProps) 
                   >
                     <span className="i-mdi-content-copy w-3 h-3"></span>
                   </button>
+                  {onMapPinClick && (
+                    <button
+                      className="btn btn-primary btn-xs ml-2"
+                      onClick={() => onMapPinClick(activity.id)}
+                      title="View this location on map"
+                    >
+                      <span className="i-mdi-map w-3 h-3"></span>
+                      View on map
+                    </button>
+                  )}
                 </div>
               )}
 
