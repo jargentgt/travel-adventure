@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Trip, Activity } from '@/types/trip'
 import { Loader } from '@googlemaps/js-api-loader'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
-import { geocodingCache, extractCoordinatesFromText, ApiUsageMonitor } from '@/utils/geocodingCache'
+import { ApiUsageMonitor } from '@/utils/geocodingCache'
 
 interface TripDetailMapProps {
   trip: Trip
@@ -275,7 +275,7 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
     loadGoogleMaps()
   }, [userHasInteracted])
 
-  // Get activities for the selected day with locations
+  // Get activities for the selected day that have pre-existing coordinates only (no geocoding)
   const getActivitiesWithLocations = (): Activity[] => {
     if (!trip.days[selectedDay]?.activities) {
       console.log('No activities found for selected day:', selectedDay)
@@ -292,16 +292,24 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
         }
         
         const activityObj = activity as Activity
-        const hasLocation = activityObj.location !== undefined && 
-                           activityObj.location !== null &&
-                           typeof activityObj.location === 'string' &&
-                           activityObj.location.trim() !== ''
         
-        return hasLocation
+        // ONLY show activities that already have valid coordinates from the API
+        if (activityObj.coordinates && 
+            typeof activityObj.coordinates.lat === 'number' && 
+            typeof activityObj.coordinates.lng === 'number' &&
+            !isNaN(activityObj.coordinates.lat) && 
+            !isNaN(activityObj.coordinates.lng)) {
+          console.log(`✅ Activity "${activityObj.title}" has coordinates: ${activityObj.coordinates.lat}, ${activityObj.coordinates.lng}`)
+          return true
+        }
+        
+        // Skip activities without coordinates (no geocoding fallback)
+        console.log(`❌ Activity "${activityObj.title}" has no coordinates - skipping (geocoding disabled)`)
+        return false
       }
     )
     
-    console.log(`Filtered ${filtered.length} activities with locations`)
+    console.log(`Filtered ${filtered.length} activities with pre-existing coordinates (geocoding disabled)`)
     return filtered
   }
 
@@ -392,75 +400,20 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
 
     const newMarkers = new Map()
     const bounds = new window.google.maps.LatLngBounds()
-    const geocoder = new window.google.maps.Geocoder()
     let successCount = 0
 
-    // Geocode and create markers with caching
-    const geocodePromises = activitiesWithLocations.map(async (activity, index) => {
+    // Create markers using pre-existing coordinates only (no geocoding)
+    const markerPromises = activitiesWithLocations.map(async (activity, index) => {
       try {
-        console.log(`🔍 Processing: ${activity.title} - ${activity.location}`)
+        console.log(`📍 Processing: ${activity.title}`)
         
-        let position: { lat: number, lng: number } | null = null
-        
-        // Step 1: Check cache first
-        const cached = geocodingCache.getCachedLocation(activity.location!)
-        if (cached) {
-          position = { lat: cached.lat, lng: cached.lng }
-          console.log(`💾 Using cached coordinates for ${activity.title}`)
-        } else {
-          // Step 2: Try to extract coordinates from text (free)
-          const descriptionText = activity.description || ''
-          const locationText = activity.location || ''
-          const extractedCoords = extractCoordinatesFromText(descriptionText + ' ' + locationText)
-          
-                        if (extractedCoords) {
-                position = extractedCoords
-                console.log(`📍 Extracted coordinates for ${activity.title}:`, position)
-                
-                // Cache the extracted coordinates with full address
-                geocodingCache.setCachedLocation(activity.location!, position, 'extracted')
-                                  } else {
-            // Step 3: Use Google Maps Geocoding API with full address from API (costs money)
-            const fullApiAddress = activity.location!.trim()
-            
-            try {
-              console.log(`🌐 Geocoding full API address: "${fullApiAddress}"`)
-              
-              const result = await new Promise<any>((resolve, reject) => {
-                geocoder.geocode(
-                  { 
-                    address: fullApiAddress,
-                    // Smart region detection from address content
-                    region: fullApiAddress.includes('日本') ? 'JP' : 
-                           fullApiAddress.includes('Korea') || fullApiAddress.includes('한국') ? 'KR' : 
-                           'JP' // Default to JP for most travel content
-                  },
-                  (results: any, status: any) => {
-                    if (status === 'OK' && results?.[0]) {
-                      resolve(results[0])
-                    } else {
-                      reject(new Error(`Geocoding failed for "${fullApiAddress}": ${status}`))
-                    }
-                  }
-                )
-              })
-              
-              position = {
-                lat: result.geometry.location.lat(),
-                lng: result.geometry.location.lng()
-              }
-              
-              // Record API usage and cache the result with full API address
-              ApiUsageMonitor.recordApiCall('geocoding')
-              geocodingCache.setCachedLocation(activity.location!, position, 'google')
-              
-              console.log(`✅ Geocoded "${activity.title}" via Google API:`, position)
-              console.log(`📍 Full API address used: "${fullApiAddress}"`)
-            } catch (error) {
-              console.warn(`❌ Failed to geocode full API address "${fullApiAddress}":`, error)
-            }
-          }
+        // Use pre-calculated coordinates from API (activities are already filtered to have coordinates)
+        const position = { 
+          lat: activity.coordinates!.lat, 
+          lng: activity.coordinates!.lng 
         }
+        console.log(`💰 Using API coordinates for ${activity.title}: ${position.lat}, ${position.lng} (source: ${activity.coordinates!.source})`)
+        
         
         if (position) {
           // Create standard Google Maps pin with category color
@@ -530,6 +483,14 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
             // Open this info window
             infoWindow.open(mapInstance, marker)
             
+            // Update checkpoint navigation to match clicked pin
+            const clickedCheckpoint = activitiesWithLocations.findIndex(act => act.id === activity.id)
+            if (clickedCheckpoint !== -1) {
+              setCurrentCheckpoint(clickedCheckpoint)
+              setTourStarted(true) // Enable checkpoint navigation
+              console.log(`🎯 Pin clicked: Updated to checkpoint ${clickedCheckpoint + 1}/${activitiesWithLocations.length}`)
+            }
+            
             // Trigger focus callback
             if (onActivityFocus) {
               onActivityFocus(activity.id)
@@ -547,9 +508,9 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
       }
     })
 
-    // Wait for all geocoding to complete
-    Promise.allSettled(geocodePromises).then(() => {
-      console.log(`✅ Day ${selectedDay + 1}: Successfully geocoded ${successCount} out of ${activitiesWithLocations.length} activities`)
+    // Wait for all marker creation to complete
+    Promise.allSettled(markerPromises).then(() => {
+      console.log(`✅ Day ${selectedDay + 1}: Successfully created ${successCount} markers out of ${activitiesWithLocations.length} activities with coordinates`)
       setMarkers(newMarkers)
 
       if (newMarkers.size > 0) {
@@ -820,7 +781,7 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
     )
   }
 
-          // Show no locations message
+        // Show no locations message
         if (activitiesWithLocations.length === 0) {
           return (
             <div className="content-container-lg">
@@ -828,11 +789,14 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
                 <div className="card-body text-center py-16">
                   <div className="flex flex-col items-center gap-4">
                     <span className="i-mdi-map-marker-off w-16 h-16 text-base-content/30"></span>
-                    <h3 className="text-xl font-semibold text-base-content/70">No Locations for Day {selectedDay + 1}</h3>
-                    <p className="text-base-content/50">
-                      Activities for Day {selectedDay + 1} don't have location information to display on the map. 
-                      Try selecting a different day above.
-                    </p>
+                    <h3 className="text-xl font-semibold text-base-content/70">No Map Locations for Day {selectedDay + 1}</h3>
+                                    <p className="text-base-content/50">
+                  Activities for Day {selectedDay + 1} don't have coordinate data to display on the map. 
+                  Only activities with GPS coordinates from the database are shown.
+                </p>
+                <div className="text-xs text-base-content/40 mt-2">
+                  💡 Run the geocoding script to add coordinates for more activities
+                </div>
                   </div>
                 </div>
               </div>
@@ -849,11 +813,6 @@ export function TripDetailMap({ trip, selectedDay, focusedActivityId, onActivity
                   Day {selectedDay + 1} Locations
                   <div className="badge badge-primary badge-sm">{activitiesWithLocations.length}</div>
                 </h3>
-                <p className="text-sm text-base-content/70 mt-2">
-                  Showing activity locations for <strong>Day {selectedDay + 1}</strong>. 
-                  Use the day navigation above to switch between days. 
-                  Click pins for activity details.
-                </p>
               </div>
         <div className="card-body">
           <div 

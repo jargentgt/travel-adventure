@@ -220,6 +220,11 @@ class PayloadService {
               date: activity.date,
               trip: typeof activity.trip === 'object' ? activity.trip.id : activity.trip,
               order: activity.order || 0,
+              coordinates: activity.coordinates ? {
+                lat: activity.coordinates.lat,
+                lng: activity.coordinates.lng,
+                source: activity.coordinates.source
+              } : undefined,
               createdAt: activity.createdAt,
               updatedAt: activity.updatedAt
             }

@@ -112,6 +112,7 @@ class OptimizedPayloadService {
           type: activity.type || 'normal',
           icon: activity.icon || '📍',
           order: activity.order || 0,
+          coordinates: activity.coordinates,
           date: day.date, // Add the date from the day
           trip: tripData.id, // Add the trip ID
           createdAt: new Date().toISOString(), // Fallback

@@ -287,7 +287,7 @@ export function TimelineItem({ activity, index, isShifted, onMapPinClick }: Time
                   >
                     <span className="i-mdi-content-copy w-3 h-3"></span>
                   </button>
-                  {onMapPinClick && (
+                  {onMapPinClick && activity.coordinates && activity.coordinates.lat && activity.coordinates.lng && (
                     <button
                       className="btn btn-primary btn-xs ml-2"
                       onClick={() => onMapPinClick(activity.id)}
@@ -371,7 +371,7 @@ export function TimelineItem({ activity, index, isShifted, onMapPinClick }: Time
                   >
                     <span className="i-mdi-content-copy w-3 h-3"></span>
                   </button>
-                  {onMapPinClick && (
+                  {onMapPinClick && activity.coordinates && activity.coordinates.lat && activity.coordinates.lng && (
                     <button
                       className="btn btn-primary btn-xs ml-2"
                       onClick={() => onMapPinClick(activity.id)}

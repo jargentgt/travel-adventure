@@ -50,6 +50,11 @@ export interface Activity {
   date: string
   trip: string | Trip
   order?: number
+  coordinates?: {
+    lat: number
+    lng: number
+    source: 'google' | 'extracted' | 'manual' | 'imported'
+  }
   createdAt: string
   updatedAt: string
 }
